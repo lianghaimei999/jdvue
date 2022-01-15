@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <!-- 1 顶部 -->
-    <div class="header scroll">
+    <div :class="{ header: true, scroll: isScrollTop }">
       <div class="classify-icon"></div>
       <div class="search-wrap">
         <div class="search-icon"></div>
@@ -11,7 +11,21 @@
     </div>
     <!-- 2 轮播图 -->
     <div class="banner-wrap">
-      <img src="//vueshop.glbuys.com/uploadfiles/1484285302.jpg" alt="" />
+      <!-- <img src="//vueshop.glbuys.com/uploadfiles/1484285302.jpg" alt="" /> -->
+      <div class="swiper-container" ref="swiper-container">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide">
+            <img src="//vueshop.glbuys.com/uploadfiles/1484285302.jpg" alt="" />
+          </div>
+          <div class="swiper-slide">
+            <img src="//vueshop.glbuys.com/uploadfiles/1484285302.jpg" alt="" />
+          </div>
+          <div class="swiper-slide">
+            <img src="//vueshop.glbuys.com/uploadfiles/1484285302.jpg" alt="" />
+          </div>
+        </div>
+        <div class="swiper-pagination" ref="swiper-pagination"></div>
+      </div>
     </div>
     <!-- 3 导航 -->
     <div class="quick-nav">
@@ -332,17 +346,62 @@
 </template>
 
 <script>
+import Swiper from "../../../assets/js/libs/swiper";
 export default {
   name: "index",
   data() {
-    return {};
+    return {
+      isScrollTop: false,
+    };
   },
-  created() {},
-  methods: {},
+  mounted() {
+    var mySwiper = new Swiper(this.$refs["swiper-container"], {
+      autoplay: 300, //可选选项，自动滑动
+      pagination: this.$refs["swiper-pagination"], //分页点
+      autoplayDisableOnInteraction: false, //用户操作swiper之后自动切换不会停止
+      paginationClickable: true,
+    });
+  },
+  created() {
+    this.isScroll = true; //全局变量，解决多次访问问题 （性能优化）
+    window.addEventListener("scroll", this.eventScrollTop);
+  },
+  methods: {
+    eventScrollTop() {
+      let scrollTop =
+        document.body.scrollTop || document.documentElement.scrollTop;
+      // console.log(scrollTop);
+
+      if (scrollTop >= 150) {
+        if (this.isScroll) {
+          this.isScroll = false;
+          this.isScrollTop = true;
+        }
+      } else {
+        if (this.isScroll == false) {
+          this.isScroll = true;
+          this.isScrollTop = false;
+        }
+      }
+    },
+  },
+  destroyed() {
+    //解决点击购物车和我的页面时 销毁监听事件
+    window.removeEventListener("scroll", this.eventScrollTop);
+  },
+  //keep-alive进入时触发
+  activated() {
+    window.addEventListener("scroll", this.eventScrollTop);
+  },
+  //keep-alive离开时触发
+  deactivated() {
+    window.removeEventListener("scroll", this.eventScrollTop);
+  },
 };
 </script>
 
 <style scoped>
+@import "../../../assets/css/common/swiper.css";
 .page {
   width: 100%;
   min-height: 100%;
