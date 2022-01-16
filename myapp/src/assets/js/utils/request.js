@@ -1,5 +1,6 @@
 import axios from 'axios';
 export function request(url,method="get",data={},config={}){
+    
     return axiosRequest(url, method,data, config)
 }
 
